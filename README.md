@@ -10,6 +10,6 @@
 
 ## Auteurs
 
-* **Mehdi KHENISSI** - [INFS3_2B](mailto:mhedi.khenissi@etudiant.univ-reims.fr)
-* **Charles MALHERBE** - [INFS3_2B](mailto:charles.malherbe@etudiant.univ-reims.fr)
+* **Mehdi KHENISSI** - [INFS4_2B](mailto:mhedi.khenissi@etudiant.univ-reims.fr)
+* **Charles MALHERBE** - [INFS4_2B](mailto:charles.malherbe@etudiant.univ-reims.fr)
 

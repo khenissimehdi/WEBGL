@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="fr">
+
+<!-- Ouverture de la balise HEAD -->
+
+<head>
+    <meta charset="utf-8">
+    <!-- Titre de la page -->
+    <title>WebGL - Hello, world!</title>
+    <meta name="description" content="WebGL - Hello, world!">
+    <meta name="author" content="Aassif Benassarou">
+    <!-- Importation de la feuille de style (CSS) -->
+    <link rel="stylesheet" href="https://webgl.benassarou.fr/tp/style.css">
+
+    <script>
+        class HelloWorld {
+            constructor(canvas) {
+                this.canvas = document.getElementById(canvas);
+                this.gl = this.canvas.getContext('webgl2');
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+                console.log('HelloWorld: ' + w + 'x' + h);
+
+                const gl = this.gl;
+                gl.viewport(0, 0, w, h);
+                gl.clearColor(0, 1, 0, 1);
+
+                this.vbo = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+                const VERTICES = [-0.5, -0.5, +0.5, -0.5, -0.5, +0.5, +0.5, +0.5];
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(VERTICES), gl.STATIC_DRAW);
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+                this.program = HelloWorld.PROGRAM(gl, 'vertex-shader', 'fragment-shader');
+                gl.bindAttribLocation(this.program, 0, 'position');
+
+                // Lance la méthode 'animation()' de la classe
+                this.animate();
+            }
+
+            // Création de la méthode animate
+            animate() {
+                // 
+                const gl = this.gl;
+                gl.clear(gl.COLOR_BUFFER_BIT);
+
+                gl.useProgram(this.program);
+                gl.uniform4f(gl.getUniformLocation(this.program, 'color'), 1, 1, 1, 1);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+                gl.enableVertexAttribArray(0);
+                gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+                gl.disableVertexAttribArray(0);
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+                gl.useProgram(null);
+
+                requestAnimationFrame(() => this.animate());
+            }
+        };
+
+
+        HelloWorld.SHADER = function(gl, type, id) {
+            const shader = gl.createShader(type);
+            const script = document.getElementById(id);
+            gl.shaderSource(shader, script.textContent);
+            gl.compileShader(shader);
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+                throw gl.getShaderInfoLog(shader);
+
+            return shader;
+        }
+
+
+        HelloWorld.PROGRAM = function(gl, vertex, fragment) {
+            const program = gl.createProgram();
+            gl.attachShader(program, HelloWorld.SHADER(gl, gl.VERTEX_SHADER, vertex));
+            gl.attachShader(program, HelloWorld.SHADER(gl, gl.FRAGMENT_SHADER, fragment));
+            gl.linkProgram(program);
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS))
+                throw gl.getProgramInfoLog(program);
+
+            return program;
+        }
+    </script>
+
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        precision mediump float; attribute vec2 position; void main () { gl_Position = vec4 (position, 0.0, 1.0); }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        precision mediump float; uniform vec4 color; void main () { gl_FragColor = color; }
+    </script>
+
+    <style>
+        /* Définition de l'aspect du body (CSS) */
+        /* Alignement du texte contenu dans le body au centre */
+        
+        body {
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<!-- Fermeture de la balise HEAD -->
+
+
+
+
+<!-- Ouverture de la balise BODY -->
+
+<body>
+
+    <!-- Texte en format titre -->
+    <h1><i>Hello, world!</i></h1>
+    <!-- Définition de l'espace d'affichage (hauteur et largeur) -->
+    <canvas id="canvas:hello-world" width="600" height="600"></canvas>
+    <script>
+        // Création d'un objet 'HelloThreeJS'
+        new HelloWorld('canvas:hello-world');
+    </script>
+
+</body>
+
+<!-- Fermeture de la balise BODY -->
+
+
+
+
+</html>

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="fr">
+
+<!-- Ouverture de la balise HEAD -->
+
+<head>
+    <meta charset="utf-8">
+    <!-- Titre de la page -->
+    <title>WebGL - Hello, three.js!</title>
+    <meta name="description" content="WebGL - Hello, three.js!">
+    <meta name="author" content="Aassif Benassarou">
+    <!-- Importation de la feuille de style (CSS) -->
+    <link rel="stylesheet" href="https://webgl.benassarou.fr/tp/style.css">
+    <!-- Importation de la librairie JavaScript (3D) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/96/three.min.js"></script>
+
+
+    <script>
+        // Classe HelloThreeJS
+        class HelloThreeJS {
+
+            // Constructeur de la classe HelloThreeJS
+            constructor(canvas) {
+
+                // Récupération de l'élément de la page ayant pour id : "Canvas"
+                // Attribution de l'élément au paramètre canvas de la classe
+                // Canvas : Espace d'affichage
+                this.canvas = document.getElementById(canvas);
+
+                // Création d'une nouvelle scène
+                // Attribution de l'élément au paramètre scene de la classe
+                this.scene = new THREE.Scene();
+
+                // Création d'une figure plate ayant pour largeur et longueur 1
+                // Attribution de l'élément à la variable geometry
+                const geometry = new THREE.PlaneGeometry(1, 1);
+
+                // Création d'un matériau (blanc) (qui ne reflète aucun éclairage)
+                const material = new THREE.MeshBasicMaterial({
+                    color: '#fff'
+                });
+
+                // Association de la figure (geometry) et du matériau (material)
+                // Ajout à la scène
+                this.scene.add(new THREE.Mesh(geometry, material));
+
+                // Création d'une caméra orthographique
+                // Attribution de la caméra à la clase
+                this.camera = new THREE.OrthographicCamera(-1, +1, +1, -1, +1, -1);
+
+                // Structure 'Settings' servant à  initialiser le renderer
+                const settings = {
+                    canvas: this.canvas,
+                    antialias: true,
+                    alpha: true
+                };
+
+                // Création d'un objet 'renderer' de type WebGLRenderer
+                // ayant pour paramètres les éléments de la structure Settings
+                this.renderer = new THREE.WebGLRenderer(settings);
+
+                // Définition de la couleur et de l'oppacité du rendu
+                this.renderer.setClearColor(0x00ff00, 1);
+
+                // Lance la méthode 'animation()' de la classe
+                this.animate();
+            }
+
+            // Création de la méthode animate
+            animate() {
+
+                // On calcule le rendu à partir de la scène et de la caméra mit en paramètre
+                this.renderer.render(this.scene, this.camera);
+
+                // Envoie une notification au navigateur l'informant que vous souhaitez exécuter une animation
+                // Appel récursif sur la fonction animate()
+                requestAnimationFrame(() => this.animate());
+
+            }
+        }
+    </script>
+
+    <style>
+        /* Définition de l'aspect du body (CSS) */
+        /* Alignement du texte contenu dans le body au centre */
+        
+        body {
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<!-- Fermeture de la balise HEAD -->
+
+
+
+
+<!-- Ouverture de la balise BODY -->
+
+<body>
+
+    <!-- Texte en format titre -->
+    <h1><em>Hello, three.js!</em></h1>
+    <!-- Définition de l'espace d'affichage (hauteur et largeur) -->
+    <canvas id="canvas:hello-three-js" width="600" height="600"></canvas>
+    <script>
+        // Création d'un objet 'HelloThreeJS'
+        new HelloThreeJS('canvas:hello-three-js');
+    </script>
+
+</body>
+
+<!-- Fermeture de la balise BODY -->
+
+
+
+</html>

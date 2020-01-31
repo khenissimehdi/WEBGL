@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="fr">
+
+<!-- Ouverture de la balise HEAD -->
+
+<head>
+    <meta charset="utf-8">
+    <!-- Titre de la page -->
+    <title>WebGL - Hello, world!</title>
+    <meta name="description" content="WebGL - Hello, world!">
+    <meta name="author" content="Mehdi KHENISSI, Charles MALHERBE">
+    <!-- Importation de la feuille de style (CSS) -->
+    <link rel="stylesheet" href="https:// webgl.benassarou.fr/tp/style.css">
+
+    <script>
+        // Classe HelloWorld
+        class HelloWorld {
+            
+            // Constructeur de la classe HelloThreeJS
+            constructor(canvas) {
+
+                // Récupération de l'élément de la page ayant pour id : "Canvas"
+                // Attribution de l'élément au paramètre canvas de la classe
+                // Canvas : Espace d'affichage
+                this.canvas = document.getElementById(canvas);
+                // On définit l'attribut gl comme un objet WebGL2RenderingContext
+                this.gl = this.canvas.getContext('webgl2');
+                // Largeur du canvas
+                var w = this.canvas.width;
+                // Hauteur du canvas
+                var h = this.canvas.height;
+                // Affichage des messages dans la console 
+                console.log('HelloWorld : ' + w + 'x' + h);
+
+                // On stocke le contexte graphique
+                var gl = this.gl;
+                // On indique la transformation affine prenant la taille du canvas
+                gl.viewport(0, 0, w, h);
+                // La couleur de nettoyage du buffer sera verte.
+                gl.clearColor (0, 1, 0, 1);
+
+                // Point de coordonnées (x, y)
+                const P = (x, y) => ({
+                    x, y
+                });
+
+                // rotation d'angle "a"
+                const R = (p, a) => {
+                    const s = Math.sin(a), c = Math.cos(a);
+                    return P(p.x * c - p.y * s, p.x * s + p.y * c);
+                }
+
+                // Translation de vecteur "t"
+                const T = (p, t) => P(p.x + t.x, p.y + t.y);
+
+                // On définit l'attribut vbo comme un objet WEBGLBuffer (stockage des couleurs et des sommets)
+                this.vbo = gl.createBuffer();
+                // On définit le buffer comme contenant les coordonnées de l'attribut vbo
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+                // Stockage des coordonnées de tous les sommets
+                var vertices = [-0.25, -0.25, +0.25, -0.25, -0.25, +0.25, +0.25, +0.25];
+                var couples = [];
+
+                for (var i = 0; i < vertices.length; i += 2) {
+                    couples.push(P(vertices[i], vertices[i + 1]));
+                }
+
+                var rotation = [];
+                for (var i = 0; i < couples.length; i++) {
+                    rotation.push(R(couples[i], Math.PI / 6));
+                }
+
+                couples = [];
+
+                for (var i = 0; i < rotation.length; i++) {
+                    couples.push(T(rotation[i], P(0.5, 0.5)));
+                }
+
+                var cp = 0;
+                for (var i = 0; i < vertices.length; i += 2) {
+                    vertices[i] = couples[cp].x;
+                    vertices[i + 1] = couples[cp].y;
+                    cp++;
+                }
+
+                // Crée et initialise le stockage de données d'un objet tampon
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+                // Suppression buffer jusqu'au point spécifié (null)
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+                // On déclare le buffer comme contenant des coordonnées (sommets, textures...)
+                this.vbo2 = gl.createBuffer();
+                // On déclare le buffer comme contenant des coordonnées (sommets, textures...)
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo2);
+
+                var vertices2 = [-0.75, -0.75, -0.25, -0.75, -0.75, -0.25, -0.25, -0.25];
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2), gl.STATIC_DRAW);
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+                // Création d'un objet WebGLProgram avec les shaders (vertex et fragment).
+                this.program = HelloWorld.PROGRAM(gl, 'vertex-shader', 'fragment-shader');
+                // On attribue à le sommet d'indice 0 à la variable position du programme
+                gl.bindAttribLocation(this.program, 0, 'position');
+                // Lance la méthode 'animation()' de la classe
+                this.animate();
+            }
+
+            // Création de la méthode animat
+            animate() {
+                // On sauvagarde l'aspect graphqiue
+                var gl = this.gl;
+                // On vide le buffer
+                gl.clear(gl.COLOR_BUFFER_BIT);
+
+                // Liaison programme et rendu
+                gl.useProgram(this.program);
+
+                // Définition des variables uniformes pour le shader
+                gl.uniform4f(gl.getUniformLocation(this.program, 'color'), 1, 0, 0, 1);
+                // On déclare le buffer comme contenant des coordonnées (sommets, textures...)
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+                // On active le tableau d'attribut
+                gl.enableVertexAttribArray(0);
+                // On déclare le tableau
+                gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+                // Dessine les sommets du tableau avec techinique triangle strip
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+                // Désactivation du tableau d'attribut
+                gl.disableVertexAttribArray(0);
+                // Supprime cible buffer
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+                // Définition des variables uniformes pour le shader
+                gl.uniform4f(gl.getUniformLocation(this.program, 'color'), 1, 1, 1, 1);
+                // On déclare le buffer comme contenant des coordonnées (sommets, textures...)
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo2);
+                // On active le tableau d'attribut
+                gl.enableVertexAttribArray(0);
+                // On déclare le tableau
+                gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+                // Dessine les sommets du tableau avec techinique triangle strip
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+                // Désactivation du tableau d'attribut
+                gl.disableVertexAttribArray(0);
+                // Supprime cible buffer
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+                // Indication fin de traitement programme
+                gl.useProgram(null);
+
+                // Envoie une notification au navigateur l'informant que vous souhaitez exécuter une animation
+                // Appel récursif sur la fonction animate()
+                requestAnimationFrame(() => this.animate());
+            }
+        };
+
+        // Fonction Helloworld.shader()
+        HelloWorld.SHADER = function(gl, type, id) {
+            // Création d'un shader
+            var shader = gl.createShader(type);
+            // Récupération de l'élément de la page ayant pour id : "id"
+            var script = document.getElementById(id);
+            // Indication de la source du shader
+            gl.shaderSource(shader, script.textContent);
+            // Compilation du shader
+            gl.compileShader(shader);
+            // Si impossible, renvoie une erreur
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+                throw gl.getShaderInfoLog(shader);
+
+            return shader;
+        }
+
+        // Fonction Helloworld.program()
+        HelloWorld.PROGRAM = function(gl, vertex, fragment) {
+            // Création d'un programme
+            var program = gl.createProgram();
+            // Fixation d'un shader de type vertex au programme
+            gl.attachShader(program, HelloWorld.SHADER(gl, gl.VERTEX_SHADER, vertex));
+            // Fixation d'un shader de type fragment au programme
+            gl.attachShader(program, HelloWorld.SHADER(gl, gl.FRAGMENT_SHADER, fragment));
+            // Liaison du programme au contexte graphique (gl)
+            gl.linkProgram(program);
+            // Si impossible, renvoie une erreur
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS))
+                throw gl.getProgramInfoLog(program);
+
+            return program;
+        }
+    </script>
+
+    <!-- Vetex shader utilisé pour l'appel de la fonction Helloworld.program -->
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        precision mediump float; attribute vec2 position; void main () { gl_Position = vec4 (position, 0.0, 1.0); }
+    </script>
+
+    <!-- Fragment shader utilisé pour l'appel de la fonction HelloWworld.program -->
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        precision mediump float; uniform vec4 color; void main () { gl_FragColor = color; }
+    </script>
+
+    <style>
+        /* Définition de l'aspect du body (CSS) */
+        /* Alignement du texte contenu dans le body au centre */
+        
+        body {
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<!-- Fermeture de la balise HEAD -->
+
+<!-- Ouverture de la balise BODY -->
+
+<body>
+
+    <!-- Texte en format titre -->
+    <h1><i>Hello, world!</i></h1>
+    <!-- Définition de l'espace d'affichage (hauteur et largeur) -->
+    <canvas id="canvas:hello-world" width="600" height="600"></canvas>
+    <script>new HelloWorld('canvas:hello-world');</script>
+
+</body>
+
+<!-- Fermeture de la balise BODY -->
+
+</html>

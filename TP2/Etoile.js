@@ -3,6 +3,8 @@ import * as data from "./data.js";
 
 class Etoile extends vao.DirectVAO {
 
+    
+
     constructor(gl, n, r1,r2) {
         Etoile.VERTICES = [];
         n=n*2
@@ -20,6 +22,8 @@ class Etoile extends vao.DirectVAO {
             }
 
         }
+     
+       
         //Etoile.VERTICES.push(Etoile.VERTICES.push[1]);
         const v = data.FLOAT32(Etoile.VERTICES);
         const a = { size: 2, type: gl.FLOAT };

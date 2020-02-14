@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html class="gr__aassif" lang="fr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>WebGL - Rainbow Quad</title>
+    <meta name="description" content="WebGL - Rainbow Quad">
+    <meta name="author" content="Aassif Benassarou">
+    <link rel="stylesheet" href="WebGL%20-%20Rainbow%20Quad_files/style.css">
+    <style>
+      body {text-align: center;}
+      input[type=range] {width: 600px;}
+    </style>
+  </head>
+
+  <body data-gr-c-s-loaded="true">
+    <h1><i>Rainbow Quad</i></h1>
+    <p><canvas id="canvas:rainbow-quad" width="600" height="600"></canvas></p>
+    <p><input id="input:blue" type="range" min="0" max="100" value="0"></p>
+    <script type="module">
+      import RainbowQuad from "./rainbow-quad.js";
+      new RainbowQuad ('canvas:rainbow-quad', 'input:blue');
+    </script>
+  
+
+</body></html>

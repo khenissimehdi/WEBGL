@@ -2,6 +2,8 @@
 
 import Quad    from "./quad.js";
 import Program from "./program.js";
+import * as matrix from "./matrix.js";
+import * as myCube from "./cube.js";
 
 class RainbowQuad
 {
@@ -17,18 +19,26 @@ class RainbowQuad
     gl.clearColor (0, 1, 0, 1);
 
     this.gl         = gl;
-    this.quad       = new Quad (gl);
+    this.quad       = new myCube.NormalCube (gl);
     this.program    = new Program (gl, RainbowQuad.PROGRAM);
     this.blue       = RainbowQuad.RANGE (r);
+    this.perspective = matrix.PERSPECTIVE( (Math.PI / 6), 1, 0.1, 10);
+    this.translation = matrix.TRANSLATION(0, 0, -5);
 
     this.animate ();
   }
 
   animate ()
   {
+    this.gl.enable (this.gl.DEPTH_TEST);
+
     this.gl.clear (this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-    this.program.use ({'b': this.blue}, p => this.quad.draw ());
+    /* FOR THE ROTATION THE 2 IS TO CHANGE THE RATATION SPEED */
+
+    const rotation = matrix.ROTATION([0, 1, 0], this.blue * 2 * Math.PI);
+
+    this.program.use ({'model' : matrix.MULTIPLY(this.translation, rotation), 'projection' : this.perspective}, p => this.quad.draw ());
 
     requestAnimationFrame (() => this.animate ());
   }
@@ -38,18 +48,19 @@ RainbowQuad.PROGRAM =
 {
   attribs: ['position'],
 
-  uniforms: {'b': 'float'},
+  uniforms: {'model' : 'mat4', 'projection' : 'mat4'},
 
   vertex:
   [
     'precision mediump float;',
-    'uniform float b;',
-    'attribute vec2 position;',
+    'uniform mat4 projection;',
+    'uniform mat4 model;',
+    'attribute vec3 position;',
     'varying vec4 color;',
     'void main ()',
     '{',
-      'color = vec4 (0.5 * position + 0.5, b, 1);',
-      'gl_Position = vec4 (position, 0, 1);',
+      'color = vec4 (0.5 * position + 0.5, 1);',
+      'gl_Position = projection * model * vec4 (position, 1);',
     '}'
   ].join ('\n'),
 
